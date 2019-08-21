@@ -1,0 +1,17 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MerginX", "MerginX\MerginX.csproj", "{9EF37D0F-08F3-4FE9-821B-3184A58845ED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9EF37D0F-08F3-4FE9-821B-3184A58845ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EF37D0F-08F3-4FE9-821B-3184A58845ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EF37D0F-08F3-4FE9-821B-3184A58845ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EF37D0F-08F3-4FE9-821B-3184A58845ED}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
