@@ -20,13 +20,17 @@ namespace MerginX
             var fechaManiana = fechaActual.AddDays(1);
             var fechaManianaEntero = Functions.ConvertToDateString(fechaManiana);
 
-            //var paths = leerRutas(@"./path/rutas.txt");
+            var paths = leerRutas(@"./path/rutas.txt");
 
-            var pathDescuentosAgotados = $"/mnt/fileszpatidesa/test/maestranetcore/20190821/descuentos_agotados_{fechaActualEntero}.csv";// $"{paths.FirstOrDefault(x=>x.Name == "AGOTADOS").Value}/descuentos_agotados_{fechaActualEntero}.csv"; //$"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0724/descuentos_agotados_{fechaActualEntero}.csv";
-            var pathMaestraDescuentos = $"/mnt/fileszpatidesa/test/maestranetcore/20190821/Maestra_Descuentos_{fechaActualEntero}.xlsx";// $"{paths.FirstOrDefault(x => x.Name == "MAESTRA").Value}/Maestra_Descuentos_{fechaActualEntero}.xlsx"; //$"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0724/Maestra_Descuentos_{fechaActualEntero}.xlsx";
-            var pathMaestraDescuentosSalida = $"/mnt/fileszpatidesa/test/maestranetcore/20190821";// $"{paths.FirstOrDefault(x => x.Name == "OUT").Value}";//"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0724/salida";
-            var pathNuevosDescuentosTSV = $"/mnt/fileszpatidesa/test/maestranetcore/20190821/hive_output_{fechaActualEntero}.tsv";// $"{paths.FirstOrDefault(x => x.Name == "NUEVOS").Value}/hive_output_{fechaActualEntero}.tsv";// $"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/190723/hive_output.tsv";
-            //var pathNuevosDescuentosXLS = "/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0724/query-hive-2976.xlsx";
+            //var pathDescuentosAgotados = $"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0821/descuentos_agotados_{fechaActualEntero}.csv"; //$"/mnt/fileszpatidesa/test/maestranetcore/20190821/descuentos_agotados_{fechaActualEntero}.csv";// $"{paths.FirstOrDefault(x=>x.Name == "AGOTADOS").Value}/descuentos_agotados_{fechaActualEntero}.csv";
+            var pathDescuentosAgotados = $"{paths.FirstOrDefault(x => x.Name == "AGOTADOS").Value}/descuentos_agotados_{fechaActualEntero}.csv";
+            //var pathMaestraDescuentos = $"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0821/Maestra_Descuentos_20190724.xlsx"; //$"/mnt/fileszpatidesa/test/maestranetcore/20190821/Maestra_Descuentos_{fechaActualEntero}.xlsx";// $"{paths.FirstOrDefault(x => x.Name == "MAESTRA").Value}/Maestra_Descuentos_{fechaActualEntero}.xlsx"; //$"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0724/Maestra_Descuentos_{fechaActualEntero}.xlsx";
+            var pathMaestraDescuentos = $"{paths.FirstOrDefault(x => x.Name == "MAESTRA").Value}/Maestra_Descuentos_{fechaActualEntero}.xlsx";
+            //var pathMaestraDescuentosSalida = $"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0821/salida"; //$"/mnt/fileszpatidesa/test/maestranetcore/20190821";// $"{paths.FirstOrDefault(x => x.Name == "OUT").Value}";//"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0724/salida";
+            var pathMaestraDescuentosSalida = $"{paths.FirstOrDefault(x => x.Name == "OUT").Value}";
+            //var pathNuevosDescuentosTSV = $"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/20190821/hive_output_{fechaActualEntero}.tsv"; //$"/mnt/fileszpatidesa/test/maestranetcore/20190821/hive_output_{fechaActualEntero}.tsv";// $"{paths.FirstOrDefault(x => x.Name == "NUEVOS").Value}/hive_output_{fechaActualEntero}.tsv";// $"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/190723/hive_output.tsv";
+            var pathNuevosDescuentosTSV = $"{paths.FirstOrDefault(x => x.Name == "NUEVOS").Value}/hive_output_{fechaActualEntero}.tsv";
+            //var pathNuevosDescuentosXLS = "/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0821/query-hive-2977.xlsx";
 
             modificarMaestra(pathMaestraDescuentos,
                              pathDescuentosAgotados,

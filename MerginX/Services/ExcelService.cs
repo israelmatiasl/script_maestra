@@ -582,7 +582,7 @@ namespace MerginX.Services
 
 
                     bool parseFechaProceso = float.TryParse(maestraTotal.MaestraDescuentos[i].FechaProceso, out float FechaProceso);
-                    if (parseFechaProceso) rowDataV1.CreateCell(42).SetCellValue(Functions.ConvertToFloat(maestraTotal.MaestraDescuentos[i].FechaProceso).Value);
+                    if (parseFechaProceso) rowDataV1.CreateCell(42).SetCellValue(Functions.ConvertToString(maestraTotal.MaestraDescuentos[i].FechaProceso));
                     else rowDataV1.CreateCell(42).SetCellValue(Functions.ConvertToString(maestraTotal.MaestraDescuentos[i].FechaProceso));
 
                 }
