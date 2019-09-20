@@ -1,0 +1,4 @@
+AGOTADOS|/mnt/fileszpatidesa/data/GeneraSecciones/MaestraDescuento
+MAESTRA|/mnt/fileszpatidesa/data/GeneraSecciones/MaestraDescuento
+OUT|/mnt/fileszpatidesa/data/GeneraSecciones/MaestraDescuento
+NUEVOS|/mnt/fileszpatidesa/data/GeneraSecciones/MaestraDescuento
