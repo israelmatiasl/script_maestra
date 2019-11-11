@@ -101,7 +101,7 @@ namespace MerginX.Entities
             DepartamentoEstablec    = departamentoEstablec;
             ProvinciaEstablec       = provinciaEstablec;
             DistritoEstablec        = distritoEstablec;
-            SegmentoCliente         = segmentoCliente;
+            SegmentoCliente         = segmentoCliente?.ToUpper();
             Url                     = url;
             Sexo                    = sexo;
             MensajeMotivador        = mensajeMotivador;
@@ -148,7 +148,7 @@ namespace MerginX.Entities
             DepartamentoEstablec    = queryMaestra.Departamento;
             ProvinciaEstablec       = queryMaestra.Provincia;
             DistritoEstablec        = queryMaestra.Distrito;
-            SegmentoCliente         = queryMaestra.SegmentoCliente;
+            SegmentoCliente         = queryMaestra.SegmentoCliente != null ? queryMaestra.SegmentoCliente.ToUpper() : queryMaestra.SegmentoCliente;
             Url                     = queryMaestra.Url;
             Sexo                    = queryMaestra.Sexo;
             MensajeMotivador        = queryMaestra.MensajeMotivador;

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using NPOI.SS.Formula.Functions;
+using Match = System.Text.RegularExpressions.Match;
 
 namespace MerginX.Helpers
 {
@@ -64,6 +66,15 @@ namespace MerginX.Helpers
             return dateInt;
         }
 
+        public static DateTime ConvertDateFromStringNumeric(string date)
+        {
+            var year_md = Convert.ToInt32(date.Substring(0, 4));
+            var month_md = Convert.ToInt32(date.Substring(4, 2));
+            var day_md = Convert.ToInt32(date.Substring(6, 2));
+            
+            var dateGenerate = new DateTime(year_md, month_md, day_md);
+            return dateGenerate;
+        }
 
         public static string ConvertToDateFromRegexDate(string date)
         {
@@ -119,6 +130,42 @@ namespace MerginX.Helpers
             return null;
         }
 
+        public static int GetIndexNotNumeric(string data)
+        {
+            int pos = -1;
+            for (int i = 0; i < data.Length; i++)
+            {
+                var converted = Int32.TryParse(data[i].ToString(), out int _);
+                if (!converted)
+                {
+                    pos = i;
+                    break;
+                }
+            }
+
+            return pos;
+        }
+        
+        public static DateTime ConvertFormatDateFromString(string date)
+        {
+            try
+            {
+                int pos = GetIndexNotNumeric(date);
+                if (pos == -1) throw new InvalidOperationException();
+
+                var dateSplited = date.Split(date[pos]);
+                
+                var dateFormated = new DateTime(Convert.ToInt32(dateSplited[2]),
+                                              Convert.ToInt32(dateSplited[1]), 
+                                              Convert.ToInt32(dateSplited[0]));
+
+                return dateFormated;
+            }
+            catch
+            {
+                return DateTime.Now;
+            }
+        }
         private static int ConvertDateValid(string date)
         {
             var arrEnteros = date.Split('/');

@@ -12,9 +12,6 @@ namespace MerginX
     {
         static void Main(string[] args)
         {
-            //var pathDeEmpresa = "/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/de_empresa_excel.xlsx";
-            // De Empresa Leer
-            //leerDeEmpresa(pathDeEmpresa);
             var fechaActual = DateTime.UtcNow;
             var fechaActualEntero = Functions.ConvertToDateString(fechaActual);
             var fechaManiana = fechaActual.AddDays(1);
@@ -22,13 +19,16 @@ namespace MerginX
 
             var paths = leerRutas("/mnt/fileszpatidesa/test/maestranetcore/app/script_maestra/MerginX/path/rutas.txt", fechaActual);
 
-            //var pathDescuentosAgotados = $"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0821/descuentos_agotados_{fechaActualEntero}.csv"; //$"/mnt/fileszpatidesa/test/maestranetcore/20190821/descuentos_agotados_{fechaActualEntero}.csv";// $"{paths.FirstOrDefault(x=>x.Name == "AGOTADOS").Value}/descuentos_agotados_{fechaActualEntero}.csv";
+            //var pathDescuentosAgotados = @"C:\\ParaTi\\data\\descuentos_agotados_20191024.csv";
             var pathDescuentosAgotados = $"{paths.FirstOrDefault(x => x.Name == "AGOTADOS").Value}";
-            //var pathMaestraDescuentos = $"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0821/Maestra_Descuentos_20190724.xlsx"; //$"/mnt/fileszpatidesa/test/maestranetcore/20190821/Maestra_Descuentos_{fechaActualEntero}.xlsx";// $"{paths.FirstOrDefault(x => x.Name == "MAESTRA").Value}/Maestra_Descuentos_{fechaActualEntero}.xlsx"; //$"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0724/Maestra_Descuentos_{fechaActualEntero}.xlsx";
+            
+            //var pathMaestraDescuentos =  @"C:\\ParaTi\\data\\Maestra_Descuentos_20191107.xlsx";
             var pathMaestraDescuentos = $"{paths.FirstOrDefault(x => x.Name == "MAESTRA").Value}";
-            //var pathMaestraDescuentosSalida = $"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0821/salida"; //$"/mnt/fileszpatidesa/test/maestranetcore/20190821";// $"{paths.FirstOrDefault(x => x.Name == "OUT").Value}";//"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0724/salida";
+            
+            //var pathMaestraDescuentosSalida = @"C:\\ParaTi\\data\\salida";
             var pathMaestraDescuentosSalida = $"{paths.FirstOrDefault(x => x.Name == "OUT").Value}";
-            //var pathNuevosDescuentosTSV = $"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/20190821/hive_output_{fechaActualEntero}.tsv"; //$"/mnt/fileszpatidesa/test/maestranetcore/20190821/hive_output_{fechaActualEntero}.tsv";// $"{paths.FirstOrDefault(x => x.Name == "NUEVOS").Value}/hive_output_{fechaActualEntero}.tsv";// $"/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/190723/hive_output.tsv";
+            
+            //var pathNuevosDescuentosTSV = @"C:\\ParaTi\\data\\hive_output_20191024.tsv";
             var pathNuevosDescuentosTSV = $"{paths.FirstOrDefault(x => x.Name == "NUEVOS").Value}";
             //var pathNuevosDescuentosXLS = "/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0821/query-hive-2977.xlsx";
 
@@ -115,12 +115,10 @@ namespace MerginX
             var descuentosAgotados = ExcelService.LeerDescuentosAgotados(pathDescuentosVencidos);
             Console.WriteLine("[{0}] Se terminó de extraer informacion de los descuentos Agotados...", DateTime.Now);
 
-            
             Console.WriteLine("[{0}] Empezando a extraer información de los descuentos Nuevos...", DateTime.Now);
             var descuentosQueryNuevos = ExcelService.LeerQueryMaestraTSV(pathDescuentosNuevos);
             //var descuentosQueryNuevos = ExcelService.LeerQueryMaestra(pathDescuentosNuevos);
             Console.WriteLine("[{0}] Se terminó de extraer información de los descuentos Nuevos...", DateTime.Now);
-
 
             Console.WriteLine("[{0}] Empezando a extraer información de la Maestra...", DateTime.Now);
             var maestraCompleta = ExcelService.LeerMaestraCompleta(pathMaestraExcel);
@@ -154,14 +152,28 @@ namespace MerginX
             Console.WriteLine("[{0}] Empezando a agregar los nuevos descuentos...", DateTime.Now);
             agregarDescuentosNuevos(ref descuentosMaestra, descuentosQueryNuevos, nuevosDescuentosPorAgregar, fechaActualEntero);
             Console.WriteLine("[{0}] Se terminó de agregar los nuevos descuentos...", DateTime.Now);
-
+            
+            // Revisar los descuentos con fecha fin
+            var resultadoMaestra = validarFechaFinDescuento(descuentosMaestra);
+            
+            //Revisar duplicidad de descuentos
+            var maestraUnica = eliminarDuplicado(resultadoMaestra.DescuentosAceptados);
+            
+            asignarIdBeneficioANulos(ref maestraUnica);
+            
             // Exporta la maestra de descuentos modificado
-            Console.WriteLine("..{0}", descuentosMaestra.Count);
-            maestraCompleta.MaestraDescuentos = descuentosMaestra.Where(x=>x.FlagEstado != "0").ToList();
+            maestraCompleta.MaestraDescuentos = maestraUnica;
             Console.WriteLine("[{0}] La nueva Maestra ahora tiene {1} datos", DateTime.Now, maestraCompleta.MaestraDescuentos.Count);
             Console.WriteLine("[{0}] Empezando a exportar la Maestra", DateTime.Now);
-            ExcelService.ExportarMaestraModificada(maestraCompleta, pathMaestraSalida, fechaManianaEntero);
+            ExcelService.ExportarMaestraModificada(maestraCompleta, pathMaestraSalida, $"Maestra_Descuentos_{fechaManianaEntero}.xlsx");
             Console.WriteLine("[{0}] Se terminó de exportar la Maestra", DateTime.Now);
+
+            if (resultadoMaestra.DescuentosRechazados.Count > 0)
+            {
+                Console.WriteLine("[{0}] Empezando a exportar los descuentos rechazados", DateTime.Now);
+                ExcelService.ExportarRechazados(resultadoMaestra.DescuentosRechazados, pathMaestraSalida, $"descuentos_rechazados_{fechaManianaEntero}.xlsx");
+                Console.WriteLine("[{0}] Se terminó de exportar los descuentos rechazados", DateTime.Now);
+            }
         }
 
         static void modificarDescuentosAgotados(ref List<MaestraDescuentos> maestraDescuentos, List<string> idDescuentosAgotados)
@@ -173,16 +185,12 @@ namespace MerginX
                 descuento.FlagEstado = "0";
             }
         }
-
         static void agregarDescuentosNuevos(ref List<MaestraDescuentos> maestraDescuentos, List<QueryMaestra> descuentosQuery, List<string> idDescuentosNuevos, int fechaActualEntero)
         {
             foreach(var idGrupoDescuento in idDescuentosNuevos)
             {
                 var descuentosNuevos = descuentosQuery.Where(x => x.CodGrupoDescuento == idGrupoDescuento &&
-                                                                    ((string.IsNullOrEmpty(x.FechaFin)) ||
-                                                                    (!string.IsNullOrEmpty(x.FechaFin) && Convert.ToInt32(x.FechaFin) >= fechaActualEntero))
-                                                             ).ToList();
-
+                                                                  string.IsNullOrEmpty(x.FechaFin)).ToList();
                 foreach(var descuentoNuevo in descuentosNuevos)
                 {
                     //Agregar alguna condicional en caso sea necesario
@@ -192,30 +200,96 @@ namespace MerginX
                 }
             }
         }
-
-        static void leerDeEmpresa(string pathDeEmpresa)
+        static List<MaestraDescuentos> eliminarDuplicado(List<MaestraDescuentos> maestraDescuentos)
         {
-            var listDeEmpresa = ExcelService.LeerDeEmpresaExcel(pathDeEmpresa);
+            var descuentosUnicos = new List<MaestraDescuentos>();
+            Console.WriteLine("[{0}] Descuentos sin revisión de duplicidad {1}", DateTime.Now, maestraDescuentos.Count);
 
-            var listDeEmpresaGroup = listDeEmpresa.GroupBy(x => new { x.DesCodEmpresa, x.DireccionFuente }).ToList();
-
-            foreach (var grouping in listDeEmpresaGroup)
+            var descuentos = maestraDescuentos.OrderByDescending(x=> Convert.ToInt32(x.FechaProceso)).Select(x => new
             {
-                if (grouping.Count() > 1)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    
-                    Console.WriteLine("DesCodEmpresa: {0}", grouping.First().DesCodEmpresa);
-                    Console.WriteLine("DireccionFuente: {0}", grouping.First().DireccionFuente);
-                    foreach (var group in grouping)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.WriteLine("({0}) - Dirección: {1}", group.NumeroFila, group.Direccion);
-                    }
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------");
-                }
+                x.TituloBeneficio,
+                x.DescripcionResumen,
+                x.Latitud,
+                x.Longitud,
+                x.SegmentoCliente,
+                x.Url
+            }).Distinct().ToList();
+
+            Console.WriteLine("[{0}] Descuentos con revisión de duplicidad {1}", DateTime.Now, descuentos.Count);
+
+            foreach (var descuento in descuentos)
+            {
+                var descuentoUnico = maestraDescuentos.FirstOrDefault(x =>
+                    x.TituloBeneficio == descuento.TituloBeneficio &&
+                    x.DescripcionResumen == descuento.DescripcionResumen &&
+                    x.Latitud == descuento.Latitud &&
+                    x.Longitud == descuento.Longitud &&
+                    x.SegmentoCliente == descuento.SegmentoCliente &&
+                    x.Url == descuento.Url);
+                
+                descuentosUnicos.Add(descuentoUnico);
             }
+            
+            return descuentosUnicos;
+        }
+        static void asignarIdBeneficioANulos(ref List<MaestraDescuentos> maestraDescuentos)
+        {
+            var descuentosSinIdBeneficio = maestraDescuentos.Where(x => string.IsNullOrEmpty(x.IdBeneficio)).ToList();
+
+            int pos = 0;
+            foreach (var descuento in descuentosSinIdBeneficio)
+            {
+                descuento.IdBeneficio = descuento.IdGrupoBeneficio + pos.ToString().PadLeft(6, '0') + "AUTOGEN";
+                pos++;
+            }
+
+            Console.WriteLine("[{0}] Se actualizaron {1} descuentos que no tenían IdBeneficios", DateTime.Now, descuentosSinIdBeneficio.Count);
+        }
+        static MaestraResultado validarFechaFinDescuento(List<MaestraDescuentos> maestraDescuentos)
+        {
+            maestraDescuentos = maestraDescuentos.Where(x=>x.FlagEstado != "0").ToList();
+            
+            var resultado = new MaestraResultado();
+            
+            var accepted = new List<MaestraDescuentos>();
+            var rejected = new List<MaestraDescuentos>();
+            int i = 1;
+            foreach (var md in maestraDescuentos)
+            {
+                //Console.WriteLine("Modificando "+ i);
+                if (string.IsNullOrEmpty(md.FechaFin))
+                {
+                    accepted.Add(md);
+                }
+                else
+                {
+                    var posNotNumeric = Functions.GetIndexNotNumeric(md.FechaFin);
+                    if (posNotNumeric == -1)
+                    {
+                        try
+                        {
+                            var _ = Functions.ConvertDateFromStringNumeric(md.FechaFin);
+                            accepted.Add(md);
+                        }
+                        catch { rejected.Add(md); }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var _ = Functions.ConvertFormatDateFromString(md.FechaFin);
+                            accepted.Add(md);
+                        }
+                        catch { rejected.Add(md); }
+                    }
+                }
+                i++;
+            }
+
+            resultado.DescuentosAceptados = accepted;
+            resultado.DescuentosRechazados = rejected;
+            
+            return resultado;
         }
     }
 

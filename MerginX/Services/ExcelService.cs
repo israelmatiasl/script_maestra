@@ -155,7 +155,7 @@ namespace MerginX.Services
                 {
                     if (!string.IsNullOrEmpty(res.FechaFin))
                     {
-                        res.FechaFin = Functions.ConvertToDateFromRegexDate(res.FechaFin);
+                        //res.FechaFin = Functions.ConvertToDateFromRegexDate(res.FechaFin);
                     }
                     resultados.Add(res);
                 }
@@ -314,7 +314,7 @@ namespace MerginX.Services
             return maestraEstablecimientos;
         }
 
-        public static void ExportarMaestraModificada(MaestraTotal maestraTotal, string pathSalida, int fechaManianaEntero)
+        public static void ExportarMaestraModificada(MaestraTotal maestraTotal, string pathSalida, string fileName)
         {
             hssfworkbook = new XSSFWorkbook();
 
@@ -457,8 +457,8 @@ namespace MerginX.Services
 
 
                     bool parseFechaFin = float.TryParse(maestraTotal.MaestraDescuentos[i].FechaFin, out float FechaFin);
-                    if (parseFechaFin) rowDataV1.CreateCell(17).SetCellValue(Functions.ConvertToFloat(maestraTotal.MaestraDescuentos[i].FechaFin).Value);
-                    else rowDataV1.CreateCell(17).SetCellValue(Functions.ConvertToString(maestraTotal.MaestraDescuentos[i].FechaFin));
+                    if (parseFechaFin) rowDataV1.CreateCell(17).SetCellValue(maestraTotal.MaestraDescuentos[i].FechaFin);
+                    else rowDataV1.CreateCell(17).SetCellValue(maestraTotal.MaestraDescuentos[i].FechaFin);
 
 
                     bool parseDetalleBeneficio = float.TryParse(maestraTotal.MaestraDescuentos[i].DetalleBeneficio, out float DetalleBeneficio);
@@ -582,8 +582,8 @@ namespace MerginX.Services
 
 
                     bool parseFechaProceso = float.TryParse(maestraTotal.MaestraDescuentos[i].FechaProceso, out float FechaProceso);
-                    if (parseFechaProceso) rowDataV1.CreateCell(42).SetCellValue(Functions.ConvertToString(maestraTotal.MaestraDescuentos[i].FechaProceso));
-                    else rowDataV1.CreateCell(42).SetCellValue(Functions.ConvertToString(maestraTotal.MaestraDescuentos[i].FechaProceso));
+                    if (parseFechaProceso) rowDataV1.CreateCell(42).SetCellValue(maestraTotal.MaestraDescuentos[i].FechaProceso);
+                    else rowDataV1.CreateCell(42).SetCellValue(maestraTotal.MaestraDescuentos[i].FechaProceso);
 
                 }
                 #endregion MAESTRA_DESCUENTOS_V1
@@ -630,9 +630,8 @@ namespace MerginX.Services
                 }
                 #endregion MAESTRA_ESTABLECIMIENTOS
 
-                string pathName = $"Maestra_Descuentos_{fechaManianaEntero}.xlsx";
-                string FilePath = $"{pathSalida}/{pathName}";
-                using (FileStream file = new FileStream(FilePath, FileMode.CreateNew, FileAccess.Write))
+                string filePath = $"{pathSalida}/{fileName}";
+                using (FileStream file = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write))
                 {
                     hssfworkbook.Write(file);
                     file.Close();
@@ -696,6 +695,291 @@ namespace MerginX.Services
                 Console.WriteLine("Ha ocurrido un error. El error es el siguiente: {0}", ex.Message);
                 return null;
             }
+        }
+
+        public static void ExportarRechazados(List<MaestraDescuentos> maestraDescuento, string pathSalida, string fileName)
+        {
+            hssfworkbook = new XSSFWorkbook();
+            try
+            {
+                ISheet sheetV1 = hssfworkbook.CreateSheet("Rechazados");
+                IRow rowHeaderV1 = sheetV1.CreateRow(0);
+                rowHeaderV1.CreateCell(0).SetCellValue("idGrupoBeneficio");
+                rowHeaderV1.CreateCell(1).SetCellValue("idBeneficio");
+                rowHeaderV1.CreateCell(2).SetCellValue("fuenteDescuentoGrupo");
+                rowHeaderV1.CreateCell(3).SetCellValue("idFuenteDescuento");
+                rowHeaderV1.CreateCell(4).SetCellValue("fuenteDescuento");
+                rowHeaderV1.CreateCell(5).SetCellValue("flagEstado");
+                rowHeaderV1.CreateCell(6).SetCellValue("imgDescuento");
+                rowHeaderV1.CreateCell(7).SetCellValue("imgLogoEmpresa");
+                rowHeaderV1.CreateCell(8).SetCellValue("imgLogoFuente");
+                rowHeaderV1.CreateCell(9).SetCellValue("tituloBeneficio");
+                rowHeaderV1.CreateCell(10).SetCellValue("idEstablecimiento");
+                rowHeaderV1.CreateCell(11).SetCellValue("nombreEstablecimiento");
+                rowHeaderV1.CreateCell(12).SetCellValue("porcentaje");
+                rowHeaderV1.CreateCell(13).SetCellValue("precioFinal");
+                rowHeaderV1.CreateCell(14).SetCellValue("moneda");
+                rowHeaderV1.CreateCell(15).SetCellValue("descripcionResumen");
+                rowHeaderV1.CreateCell(16).SetCellValue("fechaInicio");
+                rowHeaderV1.CreateCell(17).SetCellValue("fechaFin");
+                rowHeaderV1.CreateCell(18).SetCellValue("detalleBeneficio");
+                rowHeaderV1.CreateCell(19).SetCellValue("restricciones");
+                rowHeaderV1.CreateCell(20).SetCellValue("detalleAdicional");
+                rowHeaderV1.CreateCell(21).SetCellValue("diasAtencionEstab");
+                rowHeaderV1.CreateCell(22).SetCellValue("horarioEstablec");
+                rowHeaderV1.CreateCell(23).SetCellValue("ruc");
+                rowHeaderV1.CreateCell(24).SetCellValue("razonSocial");
+                rowHeaderV1.CreateCell(25).SetCellValue("direccion");
+                rowHeaderV1.CreateCell(26).SetCellValue("latitud");
+                rowHeaderV1.CreateCell(27).SetCellValue("longitud");
+                rowHeaderV1.CreateCell(28).SetCellValue("flagOnline");
+                rowHeaderV1.CreateCell(29).SetCellValue("rubroBcpApp");
+                rowHeaderV1.CreateCell(30).SetCellValue("rubroParati");
+                rowHeaderV1.CreateCell(31).SetCellValue("rubroParatiApp");
+                rowHeaderV1.CreateCell(32).SetCellValue("departamentoEstablec");
+                rowHeaderV1.CreateCell(33).SetCellValue("provinciaEstablec");
+                rowHeaderV1.CreateCell(34).SetCellValue("distritoEstablec");
+                rowHeaderV1.CreateCell(35).SetCellValue("segmentoCliente");
+                rowHeaderV1.CreateCell(36).SetCellValue("url");
+                rowHeaderV1.CreateCell(37).SetCellValue("sexo");
+                rowHeaderV1.CreateCell(38).SetCellValue("mensajeMotivador");
+                rowHeaderV1.CreateCell(39).SetCellValue("tipoSuscripcion");
+                rowHeaderV1.CreateCell(40).SetCellValue("tiporigen");
+                rowHeaderV1.CreateCell(41).SetCellValue("codpromocion");
+                rowHeaderV1.CreateCell(42).SetCellValue("fechaProceso");
+
+
+                for (int i = 0; i < maestraDescuento.Count; i++)
+                {
+                    IRow rowDataV1 = sheetV1.CreateRow(i + 1);
+                    bool parseIdGrupoBeneficio = float.TryParse(maestraDescuento[i].IdGrupoBeneficio, out float IdBrupoBeneficio);
+                    if (parseIdGrupoBeneficio) rowDataV1.CreateCell(0).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].IdGrupoBeneficio).Value);
+                    else rowDataV1.CreateCell(0).SetCellValue(Functions.ConvertToString(maestraDescuento[i].IdGrupoBeneficio));
+
+
+                    bool parseIdBeneficio = float.TryParse(maestraDescuento[i].IdBeneficio, out float IdBeneficio);
+                    if (parseIdBeneficio) rowDataV1.CreateCell(1).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].IdBeneficio).Value);
+                    else rowDataV1.CreateCell(1).SetCellValue(Functions.ConvertToString(maestraDescuento[i].IdBeneficio));
+
+
+                    bool parseFuenteDescuentoGrupo = float.TryParse(maestraDescuento[i].FuenteDescuentoGrupo, out float FuenteDescuentoGrupo);
+                    if (parseFuenteDescuentoGrupo) rowDataV1.CreateCell(2).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].FuenteDescuentoGrupo).Value);
+                    else rowDataV1.CreateCell(2).SetCellValue(Functions.ConvertToString(maestraDescuento[i].FuenteDescuentoGrupo));
+
+
+                    bool parseIdFuenteDescuento = float.TryParse(maestraDescuento[i].IdFuenteDescuento, out float IdFuenteDescuento);
+                    if (parseIdFuenteDescuento) rowDataV1.CreateCell(3).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].IdFuenteDescuento).Value);
+                    else rowDataV1.CreateCell(3).SetCellValue(Functions.ConvertToString(maestraDescuento[i].IdFuenteDescuento));
+
+
+                    bool parseFuenteDescuento = float.TryParse(maestraDescuento[i].FuenteDescuento, out float FuenteDescuento);
+                    if (parseFuenteDescuento) rowDataV1.CreateCell(4).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].FuenteDescuento).Value);
+                    else rowDataV1.CreateCell(4).SetCellValue(Functions.ConvertToString(maestraDescuento[i].FuenteDescuento));
+
+
+                    bool parseFlagEstado = float.TryParse(maestraDescuento[i].FlagEstado, out float FlagEstado);
+                    if (parseFlagEstado) rowDataV1.CreateCell(5).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].FlagEstado).Value);
+                    else rowDataV1.CreateCell(5).SetCellValue(Functions.ConvertToString(maestraDescuento[i].FlagEstado));
+
+
+                    bool parseImgDescuento = float.TryParse(maestraDescuento[i].ImgDescuento, out float ImgDescuento);
+                    if (parseImgDescuento) rowDataV1.CreateCell(6).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].ImgDescuento).Value);
+                    else rowDataV1.CreateCell(6).SetCellValue(Functions.ConvertToString(maestraDescuento[i].ImgDescuento));
+
+
+                    bool parseImgLogoEmpresa = float.TryParse(maestraDescuento[i].ImgLogoEmpresa, out float ImgLogoEmpresa);
+                    if (parseImgLogoEmpresa) rowDataV1.CreateCell(7).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].ImgLogoEmpresa).Value);
+                    else rowDataV1.CreateCell(7).SetCellValue(Functions.ConvertToString(maestraDescuento[i].ImgLogoEmpresa));
+
+
+                    bool parseImgLogoFuente = float.TryParse(maestraDescuento[i].ImgLogoFuente, out float ImgLogoFuente);
+                    if (parseImgLogoFuente) rowDataV1.CreateCell(8).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].ImgLogoFuente).Value);
+                    else rowDataV1.CreateCell(8).SetCellValue(Functions.ConvertToString(maestraDescuento[i].ImgLogoFuente));
+
+
+                    bool parseTituloBeneficio = float.TryParse(maestraDescuento[i].TituloBeneficio, out float TituloBeneficio);
+                    if (parseTituloBeneficio) rowDataV1.CreateCell(9).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].TituloBeneficio).Value);
+                    else rowDataV1.CreateCell(9).SetCellValue(Functions.ConvertToString(maestraDescuento[i].TituloBeneficio));
+
+
+                    bool parseIdEstablecimiento = float.TryParse(maestraDescuento[i].IdEstablecimiento, out float IdEstablecimiento);
+                    if (parseIdEstablecimiento) rowDataV1.CreateCell(10).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].IdEstablecimiento).Value);
+                    else rowDataV1.CreateCell(10).SetCellValue(Functions.ConvertToString(maestraDescuento[i].IdEstablecimiento));
+
+
+                    bool parseNombreEstablecimiento = float.TryParse(maestraDescuento[i].NombreEstablecimiento, out float NombreEstablecimiento);
+                    if (parseNombreEstablecimiento) rowDataV1.CreateCell(11).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].NombreEstablecimiento).Value);
+                    else rowDataV1.CreateCell(11).SetCellValue(Functions.ConvertToString(maestraDescuento[i].NombreEstablecimiento));
+
+
+                    bool parsePorcentaje = float.TryParse(maestraDescuento[i].Porcentaje, out float Porcentaje);
+                    if (parsePorcentaje) rowDataV1.CreateCell(12).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].Porcentaje).Value);
+                    else rowDataV1.CreateCell(12).SetCellValue(Functions.ConvertToString(maestraDescuento[i].Porcentaje));
+
+
+                    bool parsePrecioFinal = float.TryParse(maestraDescuento[i].PrecioFinal, out float PrecioFinal);
+                    if (parsePrecioFinal) rowDataV1.CreateCell(13).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].PrecioFinal).Value);
+                    else rowDataV1.CreateCell(13).SetCellValue(Functions.ConvertToString(maestraDescuento[i].PrecioFinal));
+
+
+                    bool parseMoneda = float.TryParse(maestraDescuento[i].Moneda, out float Moneda);
+                    if (parseMoneda) rowDataV1.CreateCell(14).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].Moneda).Value);
+                    else rowDataV1.CreateCell(14).SetCellValue(Functions.ConvertToString(maestraDescuento[i].Moneda));
+
+
+                    bool parseDescripcionResumen = float.TryParse(maestraDescuento[i].DescripcionResumen, out float DescripcionResumen);
+                    if (parseDescripcionResumen) rowDataV1.CreateCell(15).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].DescripcionResumen).Value);
+                    else rowDataV1.CreateCell(15).SetCellValue(Functions.ConvertToString(maestraDescuento[i].DescripcionResumen));
+
+
+                    bool parseFechaInicio = float.TryParse(maestraDescuento[i].FechaInicio, out float FechaInicio);
+                    if (parseFechaInicio) rowDataV1.CreateCell(16).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].FechaInicio).Value);
+                    else rowDataV1.CreateCell(16).SetCellValue(Functions.ConvertToString(maestraDescuento[i].FechaInicio));
+
+
+                    bool parseFechaFin = float.TryParse(maestraDescuento[i].FechaFin, out float FechaFin);
+                    if (parseFechaFin) rowDataV1.CreateCell(17).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].FechaFin).Value);
+                    else rowDataV1.CreateCell(17).SetCellValue(Functions.ConvertToString(maestraDescuento[i].FechaFin));
+
+
+                    bool parseDetalleBeneficio = float.TryParse(maestraDescuento[i].DetalleBeneficio, out float DetalleBeneficio);
+                    if(parseDetalleBeneficio) rowDataV1.CreateCell(18).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].DetalleBeneficio).Value);
+                    else rowDataV1.CreateCell(18).SetCellValue(Functions.ConvertToString(maestraDescuento[i].DetalleBeneficio));
+
+
+                    bool parseRestricciones = float.TryParse(maestraDescuento[i].Restricciones, out float Restricciones);
+                    if (parseRestricciones) rowDataV1.CreateCell(19).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].Restricciones).Value);
+                    else rowDataV1.CreateCell(19).SetCellValue(Functions.ConvertToString(maestraDescuento[i].Restricciones));
+
+
+                    bool parseDetalleAdicional = float.TryParse(maestraDescuento[i].DetalleAdicional, out float DetalleAdicional);
+                    if (parseDetalleAdicional) rowDataV1.CreateCell(20).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].DetalleAdicional).Value);
+                    else rowDataV1.CreateCell(20).SetCellValue(Functions.ConvertToString(maestraDescuento[i].DetalleAdicional));
+
+
+                    bool parseDiasAtencionEstab = float.TryParse(maestraDescuento[i].DiasAtencionEstab, out float DiasAtencionEstab);
+                    if (parseDiasAtencionEstab) rowDataV1.CreateCell(21).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].DiasAtencionEstab).Value);
+                    else rowDataV1.CreateCell(21).SetCellValue(Functions.ConvertToString(maestraDescuento[i].DiasAtencionEstab));
+
+
+                    bool parseHorarioEstablec = float.TryParse(maestraDescuento[i].HorarioEstablec, out float HorarioEstablec);
+                    if (parseHorarioEstablec) rowDataV1.CreateCell(22).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].HorarioEstablec).Value);
+                    else rowDataV1.CreateCell(22).SetCellValue(Functions.ConvertToString(maestraDescuento[i].HorarioEstablec));
+
+
+                    bool parseRuc = float.TryParse(maestraDescuento[i].Ruc, out float Ruc);
+                    if (parseRuc) rowDataV1.CreateCell(23).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].Ruc).Value);
+                    else rowDataV1.CreateCell(23).SetCellValue(Functions.ConvertToString(maestraDescuento[i].Ruc));
+
+
+                    bool parseRazonSocial = float.TryParse(maestraDescuento[i].RazonSocial, out float RazonSocial);
+                    if (parseRazonSocial) rowDataV1.CreateCell(24).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].RazonSocial).Value);
+                    else rowDataV1.CreateCell(24).SetCellValue(Functions.ConvertToString(maestraDescuento[i].RazonSocial));
+
+
+                    bool parseDireccion = float.TryParse(maestraDescuento[i].Direccion, out float Direccion);
+                    if (parseDireccion) rowDataV1.CreateCell(25).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].Direccion).Value);
+                    else rowDataV1.CreateCell(25).SetCellValue(Functions.ConvertToString(maestraDescuento[i].Direccion));
+
+
+                    bool parseLatitud = float.TryParse(maestraDescuento[i].Latitud, out float Latitud);
+                    if (parseLatitud) rowDataV1.CreateCell(26).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].Latitud).Value);
+                    else rowDataV1.CreateCell(26).SetCellValue(Functions.ConvertToString(maestraDescuento[i].Latitud));
+
+
+                    bool parseLongitud = float.TryParse(maestraDescuento[i].Longitud, out float Longitud);
+                    if (parseLongitud) rowDataV1.CreateCell(27).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].Longitud).Value);
+                    else rowDataV1.CreateCell(27).SetCellValue(Functions.ConvertToString(maestraDescuento[i].Longitud));
+
+
+                    bool parseFlagOnline = float.TryParse(maestraDescuento[i].FlagOnline, out float FlagOnline);
+                    if (parseFlagOnline) rowDataV1.CreateCell(28).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].FlagOnline).Value);
+                    else rowDataV1.CreateCell(28).SetCellValue(Functions.ConvertToString(maestraDescuento[i].FlagOnline));
+
+
+                    bool parseRubroBcpApp = float.TryParse(maestraDescuento[i].RubroBcpApp, out float RubroBcpApp);
+                    if (parseRubroBcpApp) rowDataV1.CreateCell(29).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].RubroBcpApp).Value);
+                    else rowDataV1.CreateCell(29).SetCellValue(Functions.ConvertToString(maestraDescuento[i].RubroBcpApp));
+
+
+                    bool parseRubroParaTi = float.TryParse(maestraDescuento[i].RubroParaTi, out float RubroParaTi);
+                    if (parseRubroParaTi) rowDataV1.CreateCell(30).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].RubroParaTi).Value);
+                    else rowDataV1.CreateCell(30).SetCellValue(Functions.ConvertToString(maestraDescuento[i].RubroParaTi));
+
+
+                    bool parseRubroParaTiApp = float.TryParse(maestraDescuento[i].RubroParaTiApp, out float RubroParaTiApp);
+                    if (parseRubroParaTiApp) rowDataV1.CreateCell(31).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].RubroParaTiApp).Value);
+                    else rowDataV1.CreateCell(31).SetCellValue(Functions.ConvertToString(maestraDescuento[i].RubroParaTiApp));
+
+
+                    bool parseDepartamentoEstablec = float.TryParse(maestraDescuento[i].DepartamentoEstablec, out float DepartamentoEstablec);
+                    if (parseDepartamentoEstablec) rowDataV1.CreateCell(32).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].DepartamentoEstablec).Value);
+                    else rowDataV1.CreateCell(32).SetCellValue(Functions.ConvertToString(maestraDescuento[i].DepartamentoEstablec));
+
+
+                    bool parseProvinciaEstablec = float.TryParse(maestraDescuento[i].ProvinciaEstablec, out float ProvinciaEstablec);
+                    if (parseProvinciaEstablec) rowDataV1.CreateCell(33).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].ProvinciaEstablec).Value);
+                    else rowDataV1.CreateCell(33).SetCellValue(Functions.ConvertToString(maestraDescuento[i].ProvinciaEstablec));
+
+
+                    bool parseDistritoEstablec = float.TryParse(maestraDescuento[i].DistritoEstablec, out float DistritoEstablec);
+                    if (parseDistritoEstablec) rowDataV1.CreateCell(34).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].DistritoEstablec).Value);
+                    else rowDataV1.CreateCell(34).SetCellValue(Functions.ConvertToString(maestraDescuento[i].DistritoEstablec));
+
+
+                    bool parseSegmentoCliente = float.TryParse(maestraDescuento[i].SegmentoCliente, out float SegmentoCliente);
+                    if (parseSegmentoCliente) rowDataV1.CreateCell(35).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].SegmentoCliente).Value);
+                    else rowDataV1.CreateCell(35).SetCellValue(Functions.ConvertToString(maestraDescuento[i].SegmentoCliente));
+
+
+                    bool parseUrl = float.TryParse(maestraDescuento[i].Url, out float Url);
+                    if (parseUrl) rowDataV1.CreateCell(36).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].Url).Value);
+                    else rowDataV1.CreateCell(36).SetCellValue(Functions.ConvertToString(maestraDescuento[i].Url));
+
+
+                    bool parseSexo = float.TryParse(maestraDescuento[i].Sexo, out float Sexo);
+                    if (parseSexo) rowDataV1.CreateCell(37).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].Sexo).Value);
+                    else rowDataV1.CreateCell(37).SetCellValue(Functions.ConvertToString(maestraDescuento[i].Sexo));
+
+
+                    bool parseMensajeMotivador = float.TryParse(maestraDescuento[i].MensajeMotivador, out float MensajeMotivador);
+                    if (parseMensajeMotivador) rowDataV1.CreateCell(38).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].MensajeMotivador).Value);
+                    else rowDataV1.CreateCell(38).SetCellValue(Functions.ConvertToString(maestraDescuento[i].MensajeMotivador));
+
+
+                    bool parseTipoSubscripcion = float.TryParse(maestraDescuento[i].TipoSubscripcion, out float TipoSubscripcion);
+                    if (parseTipoSubscripcion) rowDataV1.CreateCell(39).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].TipoSubscripcion).Value);
+                    else rowDataV1.CreateCell(39).SetCellValue(Functions.ConvertToString(maestraDescuento[i].TipoSubscripcion));
+
+
+                    bool parseTipoOrigen = float.TryParse(maestraDescuento[i].TipoOrigen, out float TipoOrigen);
+                    if (parseTipoOrigen) rowDataV1.CreateCell(40).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].TipoOrigen).Value);
+                    else rowDataV1.CreateCell(40).SetCellValue(Functions.ConvertToString(maestraDescuento[i].TipoOrigen));
+
+
+                    bool parseCodPromocion = float.TryParse(maestraDescuento[i].CodPromocion, out float CodPromocion);
+                    if (parseCodPromocion) rowDataV1.CreateCell(41).SetCellValue(Functions.ConvertToFloat(maestraDescuento[i].CodPromocion).Value);
+                    else rowDataV1.CreateCell(41).SetCellValue(Functions.ConvertToString(maestraDescuento[i].CodPromocion));
+
+
+                    bool parseFechaProceso = float.TryParse(maestraDescuento[i].FechaProceso, out float FechaProceso);
+                    if (parseFechaProceso) rowDataV1.CreateCell(42).SetCellValue(maestraDescuento[i].FechaProceso);
+                    else rowDataV1.CreateCell(42).SetCellValue(maestraDescuento[i].FechaProceso);
+
+                }
+                
+                string filePath = $"{pathSalida}/{fileName}";
+                using (FileStream file = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write))
+                {
+                    hssfworkbook.Write(file);
+                    file.Close();
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("El error es el siguiente: {0}", ex.Message);
+            }
+            hssfworkbook = null;
         }
     }
 }
