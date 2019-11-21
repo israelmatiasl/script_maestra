@@ -258,7 +258,7 @@ namespace MerginX
             {
                 if (string.IsNullOrEmpty(md.FechaFin))
                 {
-                    rejected.Add(md);
+                    accepted.Add(md);
                 }
                 else
                 {
