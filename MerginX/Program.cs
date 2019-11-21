@@ -19,16 +19,16 @@ namespace MerginX
 
             var paths = leerRutas("/mnt/fileszpatidesa/test/maestranetcore/app/script_maestra/MerginX/path/rutas.txt", fechaActual);
 
-            //var pathDescuentosAgotados = @"C:\\ParaTi\\data\\descuentos_agotados_20191024.csv";
+            //var pathDescuentosAgotados = @"C:\\ParaTi\\data\\descuentos_agotados_20191114.csv";
             var pathDescuentosAgotados = $"{paths.FirstOrDefault(x => x.Name == "AGOTADOS").Value}";
             
-            //var pathMaestraDescuentos =  @"C:\\ParaTi\\data\\Maestra_Descuentos_20191107.xlsx";
+            //var pathMaestraDescuentos =  @"C:\\ParaTi\\data\\Maestra_Descuentos_20191121.xlsx";
             var pathMaestraDescuentos = $"{paths.FirstOrDefault(x => x.Name == "MAESTRA").Value}";
             
             //var pathMaestraDescuentosSalida = @"C:\\ParaTi\\data\\salida";
             var pathMaestraDescuentosSalida = $"{paths.FirstOrDefault(x => x.Name == "OUT").Value}";
             
-            //var pathNuevosDescuentosTSV = @"C:\\ParaTi\\data\\hive_output_20191024.tsv";
+            //var pathNuevosDescuentosTSV = @"C:\\ParaTi\\data\\hive_output_20191120.tsv";
             var pathNuevosDescuentosTSV = $"{paths.FirstOrDefault(x => x.Name == "NUEVOS").Value}";
             //var pathNuevosDescuentosXLS = "/Users/israelmatiasl/PRINCIPAL/Proyectos/SFTP/CORRECCION_MAESTRA/0821/query-hive-2977.xlsx";
 
@@ -253,13 +253,12 @@ namespace MerginX
             
             var accepted = new List<MaestraDescuentos>();
             var rejected = new List<MaestraDescuentos>();
-            int i = 1;
+            
             foreach (var md in maestraDescuentos)
             {
-                //Console.WriteLine("Modificando "+ i);
                 if (string.IsNullOrEmpty(md.FechaFin))
                 {
-                    accepted.Add(md);
+                    rejected.Add(md);
                 }
                 else
                 {
@@ -268,8 +267,12 @@ namespace MerginX
                     {
                         try
                         {
-                            var _ = Functions.ConvertDateFromStringNumeric(md.FechaFin);
-                            accepted.Add(md);
+                            var endDate = Functions.ConvertDateFromStringNumeric(md.FechaFin);
+                            if (DateTime.Now <= endDate)
+                            {
+                                accepted.Add(md);
+                            }
+                            else { rejected.Add(md); }
                         }
                         catch { rejected.Add(md); }
                     }
@@ -277,13 +280,16 @@ namespace MerginX
                     {
                         try
                         {
-                            var _ = Functions.ConvertFormatDateFromString(md.FechaFin);
-                            accepted.Add(md);
+                            var endDate = Functions.ConvertFormatDateFromString(md.FechaFin);
+                            if (DateTime.Now <= endDate)
+                            {
+                                accepted.Add(md);
+                            }
+                            else { rejected.Add(md); }
                         }
                         catch { rejected.Add(md); }
                     }
                 }
-                i++;
             }
 
             resultado.DescuentosAceptados = accepted;

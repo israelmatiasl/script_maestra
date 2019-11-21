@@ -148,23 +148,16 @@ namespace MerginX.Helpers
         
         public static DateTime ConvertFormatDateFromString(string date)
         {
-            try
-            {
-                int pos = GetIndexNotNumeric(date);
-                if (pos == -1) throw new InvalidOperationException();
+            int pos = GetIndexNotNumeric(date);
+            if (pos == -1) throw new InvalidOperationException();
 
-                var dateSplited = date.Split(date[pos]);
+            var dateSplited = date.Split(date[pos]);
                 
-                var dateFormated = new DateTime(Convert.ToInt32(dateSplited[2]),
-                                              Convert.ToInt32(dateSplited[1]), 
-                                              Convert.ToInt32(dateSplited[0]));
+            var dateFormated = new DateTime(Convert.ToInt32(dateSplited[0]),
+                Convert.ToInt32(dateSplited[1]), 
+                Convert.ToInt32(dateSplited[2]));
 
-                return dateFormated;
-            }
-            catch
-            {
-                return DateTime.Now;
-            }
+            return dateFormated;
         }
         private static int ConvertDateValid(string date)
         {
